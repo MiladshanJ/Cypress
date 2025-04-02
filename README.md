@@ -1,1 +1,2 @@
 # Cypress
+The **Cypress** system is a web application designed to automate and modernize the Toronto City Council system for reporting street-related problems. The current process is manual and tedious and leaves much to be desired. The system allows citizens to easily report issues, track their status, and view reports submitted by others. The application uses an interactive map to pinpoint the location of the problem and provides real-time updates.
