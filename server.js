@@ -39,11 +39,41 @@ function hashPassword(password){
 
 
 //Registers a new user
+app.post('/register', (req, res) => {
+    const { username, password, email } = req.body;
+    try {
+        const hashed = hashPassword(password);
 
-
+        db.run('INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
+            [username, password, email],
+            function (err) {
+                if (err) return res.status(500).json({error: err.message});
+                res.status(200).json({id: this.lastID, username, email});
+            }
+        );
+    } catch (err) {
+        res.status(500).json({error: "Error hashing"});
+    }
+});
 
 //User login
+app.post('/register', (req, res) => {
+    const { username, password, email } = req.body;
 
+    db.get('SELECT * FROM users WHERE username = ?',
+        [username],
+        (err, row) => {  
+            if (err) return res.status(500).json({ error: err.message }); 
+            if (!row) return res.status(401).json({ error: "Invalid credentials" });  
+
+            const hashedPassword = hashPassword(password);  
+            if (hashedPassword !== row.password) { 
+                return res.status(401).json({ error: "Invalid credentials" });  
+            }
+            res.status(200).json({message: "Sucessful Login", user: row});
+        } 
+    );
+});
 
 
 //Submit Report
