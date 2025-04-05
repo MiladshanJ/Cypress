@@ -50,14 +50,19 @@ function hide(){
 }
 
 function addMarker(e) {
+    var date = new Date();
 
     document.getElementById("location").value = e.latlng.lat + ", " + e.latlng.lng;
+    document.getElementById("time").value = date.getHours().toString().padStart(2,0) + ":" + date.getMinutes().toString().padStart(2,0) + ":" + date.getSeconds().toString().padStart(2,0);
     show();
 
     document.getElementsByClassName('form-container')[0].scrollIntoView({behavior: 'smooth'});
     document.querySelector("form").addEventListener("submit",function(event) {
         event.preventDefault();
+        let successMsg = document.getElementById('successMessage');
+        successMsg.classList.remove('d-none');
         L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
+        this.submit.reset();
         hide();
     });
 }

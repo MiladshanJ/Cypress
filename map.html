@@ -22,19 +22,26 @@
         }
 
         #map {
-            height: 70vh; 
-            width: 75%; 
-            margin: 200px auto 50px;
+            height: 80vh; 
+            width: 95%; 
+            margin: 10px auto 10px;
             display: block;
         }
 
         .form-container {
-            max-width: auto;
+            width: 95%;
             margin: 20px auto;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
             display: none;
+            box-shadow: 1px 1px 1px rgb(185, 184, 184);
+        }
+
+        #successMessage {
+            width: 95%;
+            margin: auto;
+            font-size: large;
         }
 
 
@@ -54,19 +61,30 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
+                <div id="successMessage" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                    ✅ Your report has been successfully submitted!
+                    <br>
+                    Confirmation email sent
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 <div id="map"></div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-12">
                 <form class="form-container">
                     <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="location" class="d-block mb-1">Location:</label>
-                            <input type="text" id="location" name="location" class="form-control" required>
+                        <div class="col-md-4">
+                            <label for="location" class="d-block mb-1">Location</label>
+                            <input type="text" id="location" name="location" class="form-control" readonly>
                         </div>
-                        <div class="col-md-4 offset-md-2">
-                            <label for="problem" class="d-block mb-1">Topic:</label>
+                        <div class="col-md-3 offset-md-1">
+                            <label for="time" class="d-block mb-1">Time</label>
+                            <input type="text" id="time" name="time" class="form-control" readonly>
+                            
+                        </div>
+                        <div class="col-md-3 offset-md-1">
+                            <label for="problem" class="d-block mb-1">Topic</label>
                             <select id="issue" name="problem" class="form-control" required>
                                 <option value="">Select an Issue</option>
                                 <option value="Pothole">Pothole</option>
