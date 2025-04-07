@@ -13,7 +13,7 @@ let user;
 let report;
 let admin;
 
-const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) return console.error(err.message);
     console.log('Connected To SQLite database.');
 });
