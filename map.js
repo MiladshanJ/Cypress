@@ -49,6 +49,13 @@ function hide(){
     
 }
 
+// function markerInfoPopup(e){
+//     var markerInfo = 
+//     <div>
+//         <label for="markerLocation" id="markerLocation"></label>
+//     </div>
+// }
+
 function addMarker(e) {
     var date = new Date();
 
@@ -62,7 +69,8 @@ function addMarker(e) {
         let successMsg = document.getElementById('successMessage');
         successMsg.classList.remove('d-none');
         L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
-        this.submit.reset();
+        L.marker.bindPopup()
+        this.reset();
         hide();
     });
 }
