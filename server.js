@@ -9,7 +9,11 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.send('Server is running!');
+  });
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
@@ -25,13 +29,13 @@ const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3
 });
 
 // Create Tables 
-user = 'CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
+user = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
 db.run(user);
 
-report = 'CREATE TABLE reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, issue TEXT, time TEXT, description TEXT)';
+report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, issue TEXT, time TEXT, description TEXT)';
 db.run(report);
 
-admin = 'CREATE TABLE admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
+admin = 'CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
 db.run(admin);
 
 
