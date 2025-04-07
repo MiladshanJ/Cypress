@@ -1,13 +1,19 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
 
 let user;
 let report;
@@ -45,7 +51,7 @@ app.post('/register', (req, res) => {
         const hashed = hashPassword(password);
 
         db.run('INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
-            [username, password, email],
+            [username, hashed, email],
             function (err) {
                 if (err) return res.status(500).json({error: err.message});
                 res.status(200).json({id: this.lastID, username, email});
@@ -57,7 +63,7 @@ app.post('/register', (req, res) => {
 });
 
 //User login
-app.post('/register', (req, res) => {
+app.post('/login', (req, res) => {
     const { username, password, email } = req.body;
 
     db.get('SELECT * FROM users WHERE username = ?',

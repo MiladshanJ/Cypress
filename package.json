@@ -1,0 +1,26 @@
+{
+  "name": "cypress",
+  "version": "1.0.0",
+  "description": "The **Cypress** system is a web application designed to automate and modernize the Toronto City Council system for reporting street-related problems. The current process is manual and tedious and leaves much to be desired. The system allows citizens to easily report issues, track their status, and view reports submitted by others. The application uses an interactive map to pinpoint the location of the problem and provides real-time updates.",
+  "main": "map.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiladshanJ/Cypress.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MiladshanJ/Cypress/issues"
+  },
+  "homepage": "https://github.com/MiladshanJ/Cypress#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
