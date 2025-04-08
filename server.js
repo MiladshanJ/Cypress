@@ -13,7 +13,6 @@ app.use(express.static(path.join(__dirname, '/')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'map.html'));
-    res.send('Server is running!');
   });
 
 app.listen(port, () => {

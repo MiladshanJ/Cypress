@@ -49,13 +49,6 @@ function hide(){
     
 }
 
-// function markerInfoPopup(e){
-//     var markerInfo = 
-//     <div>
-//         <label for="markerLocation" id="markerLocation"></label>
-//     </div>
-// }
-
 function addMarker(e) {
     var date = new Date();
 
@@ -66,10 +59,19 @@ function addMarker(e) {
     document.getElementsByClassName('form-container')[0].scrollIntoView({behavior: 'smooth'});
     document.querySelector("form").addEventListener("submit",function(event) {
         event.preventDefault();
+
         let successMsg = document.getElementById('successMessage');
         successMsg.classList.remove('d-none');
-        L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
-        L.marker.bindPopup()
+
+        let lat = e.latlng.lat;
+        let lng = e.latlng.lng;
+        let location = lat.toFixed(3) + ", " + lng.toFixed(3);
+        let issue = document.getElementById("issue").value;
+        let desc = document.getElementById("description").value;
+
+        let marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${desc}`);
+
         this.reset();
         hide();
     });
