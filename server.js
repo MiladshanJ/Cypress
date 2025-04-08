@@ -48,48 +48,46 @@ function hashPassword(password){
 // ROUTES
 
 
-//Registers a new user
 app.post('/register', (req, res) => {
     const { username, password, email } = req.body;
-    try {
-        const hashed = hashPassword(password);
+    const hashedPassword = hashPassword(password);
 
-        db.run('INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
-            [username, hashed, email],
-            function (err) {
-                if (err) return res.status(500).json({error: err.message});
-                res.status(200).json({id: this.lastID, username, email});
-            }
-        );
-    } catch (err) {
-        res.status(500).json({error: "Error hashing"});
+    if (!username || !password) {
+        return res.json({ message: 'Username and password are required' });
     }
-});
-
-//User login
-app.post('/login', (req, res) => {
-    const { username, password, email } = req.body;
-
-    db.get('SELECT * FROM users WHERE username = ?',
-        [username],
-        (err, row) => {  
-            if (err) return res.status(500).json({ error: err.message }); 
-            if (!row) return res.status(401).json({ error: "Invalid credentials" });  
-
-            const hashedPassword = hashPassword(password);  
-            if (hashedPassword !== row.password) { 
-                return res.status(401).json({ error: "Invalid credentials" });  
+    
+    db.run(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, 
+        [username, hashedPassword, email], 
+        function(err) {
+            if (err) {
+                return res.json({ message: 'Account with this username or email already exists' });
             }
-            res.status(200).json({message: "Successful Login", user: row});
-        } 
-    );
+            res.json({ message: 'Registration successful', redirect: '/view-reports.html' });
+        });
 });
 
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    const hashedPassword = hashPassword(password);
+
+    db.get(`SELECT * FROM users WHERE username = ? AND password = ?`, 
+        [username, hashedPassword], 
+        (err, row) => {
+            if (err) {
+                return res.json({ message: 'Error occurred' });
+            }
+            if (row) {
+                res.json({ message: 'Login successful', redirect: '/view-reports.html' });
+            } else {
+                res.json({ message: 'Invalid username or password' });
+            }
+        });
+});
 
 //Submit Report
 app.post('/submit-report', (req, res) => {
     const {location, date, time, issueType, issue, urgency, reportStatus, description} = req.body;
-    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, JSON.stringify(reportStatus), JSON.stringify(description)],
+    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description)],
         function(err) {
             if (err) return res.status(500).json({error: err.message});
             res.status(200).json({id: this.lastID, location, date, time, issueType, issue, urgency, reportStatus, description});

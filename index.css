@@ -1,0 +1,35 @@
+textarea { resize: none; }
+
+body {
+    font-family: 'Trebuchet MS';
+}
+
+h1 {
+    color: white;  
+    background-color: rgb(22, 87, 136); 
+    padding: 20px;
+    text-align: left;
+}
+
+#map {
+    height: 80vh; 
+    width: 95%; 
+    margin: 10px auto 10px;
+    display: block;
+}
+
+.form-container {
+    width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: none;
+    box-shadow: 1px 1px 1px rgb(185, 184, 184);
+}
+
+#successMessage {
+    width: 95%;
+    margin: auto;
+    font-size: large;
+}
