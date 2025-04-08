@@ -44,6 +44,17 @@
             font-size: large;
         }
 
+        .custom-select-arrow {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 8L10 13L15 8' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2rem;
+        }
+
 
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -74,18 +85,41 @@
             <div class="col-12">
                 <form class="form-container">
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="location" class="d-block mb-1">Location</label>
                             <input type="text" id="location" name="location" class="form-control" readonly>
                         </div>
-                        <div class="col-md-3 offset-md-1">
+                        <div class="col-md-2 offset-md-1">
+                            <label for="date" class="d-block mb-1">Date</label>
+                            <input type="text" id="date" name="date" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-2 offset-md-1">
                             <label for="time" class="d-block mb-1">Time</label>
                             <input type="text" id="time" name="time" class="form-control" readonly>
-                            
+                        </div>
+                        <div class="col-md-2 offset-md-1">
+                            <label for="Urgency" class="d-block mb-1">Urgency</label>
+                            <select id="urgency" name="urgency" class="form-select" required>
+                                <option value="">Select an Issue</option>
+                                <option value="Pothole">Pothole</option>
+                                <option value="Something1">????</option>
+                                <option value="SOmehting2">??????</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="problem" class="d-block mb-1">Issue Type</label>
+                            <select id="issueType" name="issuetype" class="form-select" required>
+                                <option value="">Select an Issue Type</option>
+                                <option value="Pothole">Pothole</option>
+                                <option value="Something1">????</option>
+                                <option value="SOmehting2">??????</option>
+                            </select>
                         </div>
                         <div class="col-md-3 offset-md-1">
-                            <label for="problem" class="d-block mb-1">Topic</label>
-                            <select id="issue" name="problem" class="form-control" required>
+                            <label for="problem" class="d-block mb-1">Issue</label>
+                            <select id="issue" name="problem" class="form-select" required>
                                 <option value="">Select an Issue</option>
                                 <option value="Pothole">Pothole</option>
                                 <option value="Something1">????</option>
