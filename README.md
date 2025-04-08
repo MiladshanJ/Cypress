@@ -1,2 +1,36 @@
 # Cypress
 The **Cypress** system is a web application designed to automate and modernize the Toronto City Council system for reporting street-related problems. The current process is manual and tedious and leaves much to be desired. The system allows citizens to easily report issues, track their status, and view reports submitted by others. The application uses an interactive map to pinpoint the location of the problem and provides real-time updates.
+## 🚀 Features
+
+- 📍 Interactive map for geolocated issue reporting
+- 🧾 User registration and login
+- 🧑‍💻 Admin login and report management
+- 🗂️ View all submitted reports from the database
+- 🔐 Password hashing for user security
+- 💬 Dynamic popup for each report with issue details
+
+## 📦 Tech Stack
+
+- **Frontend**: HTML, CSS, JavaScript, Leaflet.js
+- **Backend**: Node.js, Express
+- **Database**: SQLite3
+- **Tools**: Git, VS Code, Postman (for testing APIs)
+
+## 📁 Project Structure
+project-root/ │ ├── public/ # Frontend assets (map.html, styles, map.js) │ ├── map.html │ └── map.js │ ├── server.js # Express server and API routes ├── database.db # SQLite database ├── package.json # Node dependencies ├── .gitignore └── README.md # This file
+
+## ⚙️ Installation & Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/cypress-report-system.git
+cd cypress-report-system
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the server
+node server.js
+
+# 4. Open your browser
+http://localhost:3000
