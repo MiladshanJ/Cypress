@@ -1,10 +1,10 @@
 var map = L.map('map', {
-zoom: 13,
-minZoom: 4,
-maxBounds: [ [43.579608, -79.639283],
-                [43.855443, -79.113219] ],
+zoom: 12,
+minZoom: 11,
+maxZoom: 18,
+maxBounds: [ [43.579608, -79.639283], [43.855443, -79.113219] ],
 maxBoundsViscosity: 1.0,
-}).setView([43.7175, -79.4243], 13);
+}).setView([43.7175, -79.4243], 10);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -21,9 +21,6 @@ fetch('/reports')
         });
     });
 
-var locations = [];
-var issues = [];
-var descriptions = [];
 var currentCoord = null;
 
 function cancelReport() {
@@ -114,4 +111,10 @@ document.querySelector("form").addEventListener("submit",function(event) {
 });
 
 
-map.on('click', addMarker);
+map.on('click', function(e) {
+    if (map.options.maxBounds.contains(e.latlng)) {
+        addMarker(e);
+    } else {
+        alert("Location is outside of Toronto");
+    }
+});
