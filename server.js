@@ -80,7 +80,7 @@ app.post('/login', (req, res) => {
             if (hashedPassword !== row.password) { 
                 return res.status(401).json({ error: "Invalid credentials" });  
             }
-            res.status(200).json({message: "Sucessful Login", user: row});
+            res.status(200).json({message: "Successful Login", user: row});
         } 
     );
 });
@@ -108,8 +108,22 @@ app.get('/reports',(req, res) => {
     })
 }) 
 
-//Register new admin
-
-
 
 //Login admin 
+app.post('/admin-login', (req, res) => {
+    const { username, password, email } = req.body;
+
+    db.get('SELECT * FROM admins WHERE username = ?',
+        [username],
+        (err, row) => {  
+            if (err) return res.status(500).json({ error: err.message }); 
+            if (!row) return res.status(401).json({ error: "Invalid credentials" });  
+
+            const hashedPassword = hashPassword(password);  
+            if (hashedPassword !== row.password) { 
+                return res.status(401).json({ error: "Invalid credentials" });  
+            }
+            res.status(200).json({message: "Successful Login", admin: row});
+        } 
+    );
+});
