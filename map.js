@@ -64,8 +64,9 @@ function addMarker(e) {
     var date = new Date();
     currentCoord = e.latlng;
 
-    document.getElementById("location").value = e.latlng.lat + ", " + e.latlng.lng;
+    document.getElementById("location").value = e.latlng.lat.toFixed(9) + ", " + e.latlng.lng.toFixed(9);
     document.getElementById("time").value = date.getHours().toString().padStart(2,0) + ":" + date.getMinutes().toString().padStart(2,0) + ":" + date.getSeconds().toString().padStart(2,0);
+    document.getElementById("date").value = date.getFullYear().toString() + "-" + (date.getMonth()+1).toString().padStart(2,0) + "-" + date.getDate().toString().padStart(2,0);
     show();
 
     document.getElementsByClassName('form-container')[0].scrollIntoView({behavior: 'smooth'});
@@ -81,8 +82,12 @@ document.querySelector("form").addEventListener("submit",function(event) {
     let lng = currentCoord.lng;
     let location = lat.toFixed(3) + ", " + lng.toFixed(3);
     let issue = document.getElementById("issue").value;
+    let date = document.getElementById("date").value;
     let description = document.getElementById("description").value;
     let time = document.getElementById("time").value;
+    let issueType = document.getElementById("issueType").value;
+    let urgency = document.getElementById("urgency").value;
+    let reportStatus = "Open";
 
     fetch('/submit-report', {
         method: 'POST',

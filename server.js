@@ -89,7 +89,7 @@ app.post('/login', (req, res) => {
 //Submit Report
 app.post('/submit-report', (req, res) => {
     const {location, date, time, issueType, issue, urgency, reportStatus, description} = req.body;
-    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description)],
+    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, JSON.stringify(reportStatus), JSON.stringify(description)],
         function(err) {
             if (err) return res.status(500).json({error: err.message});
             res.status(200).json({id: this.lastID, location, date, time, issueType, issue, urgency, reportStatus, description});
