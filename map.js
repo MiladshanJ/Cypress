@@ -69,6 +69,19 @@ function addMarker(e) {
         let issue = document.getElementById("issue").value;
         let desc = document.getElementById("description").value;
 
+        fetch('/submit-report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                location,
+                issue,
+                time,
+                description
+            })
+        })
+
         let marker = L.marker([lat, lng]).addTo(map);
         marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${desc}`);
 
