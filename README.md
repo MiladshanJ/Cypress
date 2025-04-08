@@ -14,17 +14,14 @@ The **Cypress** system is a web application designed to automate and modernize t
 - **Frontend**: HTML, CSS, JavaScript, Leaflet.js
 - **Backend**: Node.js, Express
 - **Database**: SQLite3
-- **Tools**: Git, VS Code, Postman (for testing APIs)
-
-## 📁 Project Structure
-project-root/ │ ├── public/ # Frontend assets (map.html, styles, map.js) │ ├── map.html │ └── map.js │ ├── server.js # Express server and API routes ├── database.db # SQLite database ├── package.json # Node dependencies ├── .gitignore └── README.md # This file
+- **Tools**: Git, VS Code
 
 ## ⚙️ Installation & Setup
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/cypress-report-system.git
-cd cypress-report-system
+git clone https://github.com/your-username/cypress.git
+cd cypress
 
 # 2. Install dependencies
 npm install
