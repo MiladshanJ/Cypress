@@ -10,6 +10,16 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+fetch('/reports')
+    .then(res => res.json())
+    .then(data => {
+        data.reports.forEach(report => {
+            var [lat, lng] = report.location.split(',').map(position => parseFloat(position.trim()));
+
+            var marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(`<b>Location:</b> ${report.location}<br><b>Issue:</b> ${report.issue}<br><b>Description:</b> ${report.desc}`);
+        });
+    });
 
 var locations = [];
 var issues = [];

@@ -97,6 +97,16 @@ app.post('/submit-report', (req, res) => {
     );
 });
 
+//Display all Reports
+app.get('/reports',(req, res) => {
+    db.all('SELECT * FROM reports', [], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ status: 'error', message: 'Failed to fetch reports' });
+        }
+        res.status(200).json({ status: 'success', reports: rows });
+    })
+}) 
 
 //Register new admin
 
