@@ -24,6 +24,7 @@ fetch('/reports')
 var locations = [];
 var issues = [];
 var descriptions = [];
+var currentCoord = null;
 
 function cancelReport() {
     let location = document.getElementById("location");
@@ -61,44 +62,47 @@ function hide(){
 
 function addMarker(e) {
     var date = new Date();
+    currentCoord = e.latlng;
 
     document.getElementById("location").value = e.latlng.lat + ", " + e.latlng.lng;
     document.getElementById("time").value = date.getHours().toString().padStart(2,0) + ":" + date.getMinutes().toString().padStart(2,0) + ":" + date.getSeconds().toString().padStart(2,0);
     show();
 
     document.getElementsByClassName('form-container')[0].scrollIntoView({behavior: 'smooth'});
-    document.querySelector("form").addEventListener("submit",function(event) {
-        event.preventDefault();
-
-        let successMsg = document.getElementById('successMessage');
-        successMsg.classList.remove('d-none');
-
-        let lat = e.latlng.lat;
-        let lng = e.latlng.lng;
-        let location = lat.toFixed(3) + ", " + lng.toFixed(3);
-        let issue = document.getElementById("issue").value;
-        let desc = document.getElementById("description").value;
-
-        fetch('/submit-report', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                location,
-                issue,
-                time,
-                description
-            })
-        })
-
-        let marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${desc}`);
-
-        this.reset();
-        hide();
-    });
 }
+
+document.querySelector("form").addEventListener("submit",function(event) {
+    event.preventDefault();
+
+    let successMsg = document.getElementById('successMessage');
+    successMsg.classList.remove('d-none');
+
+    let lat = currentCoord.lat;
+    let lng = currentCoord.lng;
+    let location = lat.toFixed(3) + ", " + lng.toFixed(3);
+    let issue = document.getElementById("issue").value;
+    let description = document.getElementById("description").value;
+    let time = document.getElementById("time").value;
+
+    fetch('/submit-report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            location,
+            issue,
+            time,
+            description
+        })
+    })
+
+    let marker = L.marker([lat, lng]).addTo(map);
+    marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${description}`);
+
+    this.reset();
+    hide();
+});
 
 
 map.on('click', addMarker);

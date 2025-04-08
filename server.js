@@ -88,8 +88,8 @@ app.post('/login', (req, res) => {
 
 //Submit Report
 app.post('/submit-report', (req, res) => {
-    const {location, time, issue, description } = req.body;
-    db.run('INSERT INTO reports (location, issue, time, description) VALUES (?, ?, ?, ?)', [location, time, issue, description],
+    const {location, issue, time, description } = req.body;
+    db.run('INSERT INTO reports (location, issue, time, description) VALUES (?, ?, ?, ?)', [location, issue, JSON.stringify(time), JSON.stringify(description)],
         function(err) {
             if (err) return res.status(500).json({error: err.message});
             res.status(200).json({id: this.lastID, location, issue, time, description});
