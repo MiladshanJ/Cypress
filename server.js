@@ -32,7 +32,7 @@ const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3
 user = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
 db.run(user);
 
-report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, issue TEXT, time TEXT, description TEXT)';
+report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, date TEXT, time TEXT, issueType TEXT, issue TEXT, urgency TEXT, status TEXT, description TEXT)';
 db.run(report);
 
 admin = 'CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
@@ -88,11 +88,11 @@ app.post('/login', (req, res) => {
 
 //Submit Report
 app.post('/submit-report', (req, res) => {
-    const {location, issue, time, description } = req.body;
-    db.run('INSERT INTO reports (location, issue, time, description) VALUES (?, ?, ?, ?)', [location, issue, JSON.stringify(time), JSON.stringify(description)],
+    const {location, date, time, issueType, issue, urgency, reportStatus, description} = req.body;
+    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description)],
         function(err) {
             if (err) return res.status(500).json({error: err.message});
-            res.status(200).json({id: this.lastID, location, issue, time, description});
+            res.status(200).json({id: this.lastID, location, date, time, issueType, issue, urgency, reportStatus, description});
         }
     );
 });

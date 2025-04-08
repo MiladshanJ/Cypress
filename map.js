@@ -91,8 +91,12 @@ document.querySelector("form").addEventListener("submit",function(event) {
         },
         body: JSON.stringify({
             location,
-            issue,
+            date,
             time,
+            issueType,
+            issue,
+            urgency,
+            reportStatus,  
             description
         })
     })
