@@ -1,42 +1,55 @@
-// Fetch reports from the backend and display them
 fetch('/reports')
-.then(res => res.json())
-.then(data => {
-    const reportsContainer = document.getElementById('reportsContainer');
-    data.reports.forEach(report => {
-        const { id, location, issueType, issue, urgency, status, description, createdAt, maker } = report;
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('reportContainer');
+        data.reports.forEach((report, index) => {
+            const reportBox = document.createElement('div');
+            reportBox.className = 'report-box';
 
-        // Creating a report box element
-        const reportBox = document.createElement('div');
-        reportBox.classList.add('report-box');
+            const mapId = `map-${index}`;
+            reportBox.innerHTML = `
+                <div id="${mapId}" class="map"></div>
+                <div class="report-info"><strong>Issue:</strong> ${report.issue}</div>
+                <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
+                <div class="report-info"><strong>Description:</strong> ${report.description}</div>
+                <div class="report-info"><strong>Status:</strong> ${report.status}</div>
+                <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
+                <div class="report-info"><strong>Date:</strong> ${report.date}</div>
+                <div class="report-info"><strong>Time:</strong> ${report.time}</div>
+                <div class="report-info"><strong>Location:</strong> ${report.location}</div>
+                <div class="report-buttons">
+                    <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
+                    <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
+                </div>
+            `;
 
-        const reportDate = new Date(createdAt);
-        const formattedDate = reportDate.toLocaleString();
+            container.appendChild(reportBox);
 
-        // Create the content for the report box
-        reportBox.innerHTML = `
-            <div class="report-header">
-                <b>Issue Type:</b> ${issueType}
-            </div>
-            <div class="report-body">
-                <b>Location:</b> ${location}<br>
-                <b>Issue:</b> ${issue}<br>
-                <b>Description:</b> ${description}<br>
-            </div>
-            <div class="report-footer">
-                <span><b>Status:</b> ${status}</span>
-                <span><b>Urgency:</b> ${urgency}</span>
-            </div>
-            <div class="report-info">
-                <span><b>Reported by:</b> ${maker}</span>
-                <a href="https://www.openstreetmap.org/?mlat=${location.split(',')[0]}&mlon=${location.split(',')[1]}" class="map-link" target="_blank">View on Map</a>
-            </div>
-        `;
+            const [lat, lng] = report.location.split(',').map(coord => parseFloat(coord.trim()));
+            const map = L.map(mapId, {
+                zoomControl: false,
+                dragging: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false,
+                keyboard: false,
+                tap: false
+            }).setView([lat, lng], 14);
 
-        // Append the report box to the container
-        reportsContainer.appendChild(reportBox);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map);
+        });
     });
-})
-.catch(err => {
-    console.error('Error fetching reports:', err);
-});
+
+function deleteReport(reportId) {
+    fetch(`/reports/${reportId}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+            alert("Report deleted successfully.");
+            window.location.reload();
+        })
+        .catch(err => console.error("Error deleting report:", err));
+}

@@ -2,24 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Reports</title>
-    <link rel="stylesheet" href="admin.css">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
+    <header>Admin Dashboard - View & Manage Reports</header>
+    <div class="container" id="reportContainer"></div>
 
-<header>
-    Admin Panel - Reports
-</header>
-
-<div class="container">
-    <a href="/admin-dashboard" class="back-btn">Back to Dashboard</a>
-    <div id="reportsContainer">
-        <!-- Reports will be dynamically inserted here -->
-    </div>
-</div>
-
-<script src="admin.js"></script>
-
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
