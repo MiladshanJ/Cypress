@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Reports</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .report-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .report-box:hover {
+            transform: scale(1.05);
+        }
+
+        .report-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .report-body {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .report-footer {
+            font-size: 0.9em;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-flagged {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .btn-resolve {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .report-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .map-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-btn {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background-color: #34495e;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    Admin Panel - Reports
+</header>
+
+<div class="container">
+    <a href="/admin-dashboard" class="back-btn">Back to Dashboard</a>
+    <div id="reportsContainer">
+        <!-- Reports will be dynamically inserted here -->
+    </div>
+</div>
+
+<script>
+    // Fetch reports from the backend and display them
+    fetch('/reports')
+        .then(res => res.json())
+        .then(data => {
+            const reportsContainer = document.getElementById('reportsContainer');
+            data.reports.forEach(report => {
+                const { id, location, issueType, issue, urgency, status, description, createdAt, maker } = report;
+
+                // Creating a report box element
+                const reportBox = document.createElement('div');
+                reportBox.classList.add('report-box');
+
+                const reportDate = new Date(createdAt);
+                const formattedDate = reportDate.toLocaleString();
+
+                // Create the content for the report box
+                reportBox.innerHTML = `
+                    <div class="report-header">
+                        <b>Issue Type:</b> ${issueType}
+                    </div>
+                    <div class="report-body">
+                        <b>Location:</b> ${location}<br>
+                        <b>Issue:</b> ${issue}<br>
+                        <b>Description:</b> ${description}<br>
+                    </div>
+                    <div class="report-footer">
+                        <span><b>Status:</b> ${status}</span>
+                        <span><b>Urgency:</b> ${urgency}</span>
+                    </div>
+                    <div class="report-info">
+                        <span><b>Reported by:</b> ${maker}</span>
+                        <a href="https://www.openstreetmap.org/?mlat=${location.split(',')[0]}&mlon=${location.split(',')[1]}" class="map-link" target="_blank">View on Map</a>
+                    </div>
+                `;
+
+                // Append the report box to the container
+                reportsContainer.appendChild(reportBox);
+            });
+        })
+        .catch(err => {
+            console.error('Error fetching reports:', err);
+        });
+</script>
+
+</body>
+</html>
