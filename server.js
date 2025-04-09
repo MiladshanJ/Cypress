@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
+const session = require('express-session');
 
 const app = express();
 const port = 3000;
@@ -10,6 +11,12 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/')));
+
+app.use(session({
+    secret: 'CPS406',
+    resave: false,
+    saveUninitialized: true,
+}));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'map.html'));
@@ -32,7 +39,7 @@ const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3
 user = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
 db.run(user);
 
-report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, date TEXT, time TEXT, issueType TEXT, issue TEXT, urgency TEXT, status TEXT, description TEXT)';
+report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, date TEXT, time TEXT, issueType TEXT, issue TEXT, urgency TEXT, status TEXT, description TEXT, username TEXT)';
 db.run(report);
 
 admin = 'CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
@@ -77,7 +84,7 @@ app.post('/login', (req, res) => {
                 return res.json({ message: 'Error occurred' });
             }
             if (row) {
-                res.json({ message: 'Login successful', redirect: '/map.html' });
+                res.json({ message: 'Login successful', redirect: '/map.html' , username: row.username});
             } else {
                 res.json({ message: 'Invalid username or password' });
             }
@@ -86,8 +93,9 @@ app.post('/login', (req, res) => {
 
 //Submit Report
 app.post('/submit-report', (req, res) => {
-    const {location, date, time, issueType, issue, urgency, reportStatus, description} = req.body;
-    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description)],
+    const {location, date, time, issueType, issue, urgency, reportStatus, description, username} = req.body;
+    
+    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description), username],
         function(err) {
             if (err) return res.status(500).json({error: err.message});
             res.status(200).json({id: this.lastID, location, date, time, issueType, issue, urgency, reportStatus, description});

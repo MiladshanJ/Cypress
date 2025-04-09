@@ -85,6 +85,7 @@ document.querySelector("form").addEventListener("submit",function(event) {
     let issueType = document.getElementById("issueType").value;
     let urgency = document.getElementById("urgency").value;
     let reportStatus = "Open";
+    let username = localStorage.getItem("username");
 
     fetch('/submit-report', {
         method: 'POST',
@@ -99,7 +100,8 @@ document.querySelector("form").addEventListener("submit",function(event) {
             issue,
             urgency,
             reportStatus,  
-            description
+            description,
+            username
         })
     })
 
