@@ -21,13 +21,14 @@ fetch('/reports')
         });
     });
 
+var forum = document.getElementsByClassName("form-container")[0];
 var currentCoord = null;
 
 function cancelReport() {
     let location = document.getElementById("location");
     let issue = document.getElementById("issue");
     let description = document.getElementById("description");
-    let forum = document.getElementsByClassName("form-containter")[0];
+    form = document.getElementsByClassName("form-container")[0];
     location.value = "";
     issue.value = "";
     description.value = "";
@@ -38,23 +39,55 @@ function submitReport() {
     let location = document.getElementById("location");
     let issue = document.getElementById("issue");
     let description = document.getElementById("description");
-    let forum = document.getElementsByClassName("form-containter")[0];
-    locations.push(location.value);
-    issues.push(issue.value);
-    descriptions.push(description.value);
+    form = document.getElementsByClassName("form-container")[0];
     hide();
 }
 
-function show(){
-    let forum = document.getElementsByClassName("form-container")[0];
+function show() {
+    form = document.getElementsByClassName("form-container")[0];
     forum.style.display = 'block';
     
 }
 
-function hide(){
-    let forum = document.getElementsByClassName("form-container")[0];
+function hide() {
+    form = document.getElementsByClassName("form-container")[0];
     forum.style.display = 'none';
     
+}
+
+function setIssues() {
+    var issueType = document.getElementById("issueType").value;
+    var issueSelect = document.getElementById("issue");
+    const issueTypes = {
+        infrastructure: ['Pothole', 'Damaged Sidewalk', 'Cracked Pavement', 'Loose Manhole Cover'],
+        utility: ['Damaged Streetlight', 'Exposed Wiring', 'Water Main'],
+        sanitation: ['Overflowing Trash Bin', 'Illegal Dumping', 'Littering'],
+        environment: ['Fallen Tree', 'Flooding', 'Animal Sightning', 'Blocked Drain'],
+        traffic: ['Damaged Traffic Light', 'Obstructed Sign', 'Gridlock/Traffic Issues']
+    };
+    issueSelect.innerHTML = '';
+    
+   
+    if (!issueTypes[issueType]) {
+        var issue = document.createElement('option');
+        issue.text = "Select an issue type first";
+        
+        issueSelect.appendChild(issue);
+    } else {
+        var selectMessage = document.createElement('option');
+        selectMessage.text = 'Select an Issue';
+        selectMessage.disabled = true;
+        selectMessage.selected = true;
+        selectMessage.value = '';
+        issueSelect.appendChild(selectMessage);
+
+        issueTypes[issueType].forEach(problem => {
+            var issue = document.createElement('option');
+            issue.value = problem.toLowerCase();
+            issue.text = problem;
+            issueSelect.appendChild(issue);
+        });
+    } 
 }
 
 function addMarker(e) {
@@ -109,6 +142,7 @@ document.querySelector("form").addEventListener("submit",function(event) {
     marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${description}`);
 
     this.reset();
+    setIssues();
     hide();
 });
 
