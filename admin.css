@@ -13,20 +13,24 @@ header {
     font-size: 1.5rem;
 }
 
-.container {
+#reportContainer {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
     padding: 2rem;
-    gap: 1.5rem;
+    max-height: 85vh;
+    overflow-y: auto;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 900px;
 }
 
 .report-box {
-    background: white;
+    background-color: #fff;
+    padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    padding: 1rem;
-    width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 .map {
