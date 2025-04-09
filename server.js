@@ -62,7 +62,7 @@ app.post('/register', (req, res) => {
             if (err) {
                 return res.json({ message: 'Account with this username or email already exists' });
             }
-            res.json({ message: 'Registration successful', redirect: '/view-reports.html' });
+            res.json({ message: 'Registration successful', redirect: '/map.html' });
         });
 });
 

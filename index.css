@@ -22,9 +22,9 @@ h1 {
     width: 95%;
     margin: 20px auto;
     padding: 20px;
-    background: #f8f9fa;
+    background: #efefef;
     border-radius: 10px;
-    display: none;
+    display: block;
     box-shadow: 1px 1px 1px rgb(185, 184, 184);
 }
 
