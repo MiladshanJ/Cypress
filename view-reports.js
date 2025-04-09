@@ -1,52 +1,131 @@
-const map = L.map('map', {
-    zoom: 13,
-    minZoom: 4,
-    maxBounds: [
-        [43.579608, -79.639283],
-        [43.855443, -79.113219]
-    ],
-    maxBoundsViscosity: 1.0
-}).setView([43.7175, -79.4243], 13);
+const map = L.map('map').setView([43.65107, -79.347015], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        let allReports = [];
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+        fetch('/reports')
+            .then(res => res.json())
+            .then(data => {
+                allReports = data.reports;
+                initIssueTypeDropdown(allReports);
+                displayReports(allReports);
+            })
+            .catch(err => console.error('Error fetching reports:', err));
 
-const reports = 
-[
-    {
-        location: "43.7000, -79.4200",
-        time: "14:05:23",
-        issue: "Pothole",
-        description: "Pothole near TMU.",
-        reportedBy: "Ranbir Singh Fuddu"
-    },
-    {
-        location: "43.7150, -79.4300",
-        time: "15:10:12",
-        issue: "Car Crash",
-        description: "HELPPPPPPPP.",
-        reportedBy: "Umair Pakistani Puta"
-    }
-];
+        const reportsContainer = document.getElementById('reportsContainer');
+        const sortSelect = document.getElementById('sortSelect');
+        const issueTypeSelect = document.getElementById('issueTypeSelect');
+        const subIssueSelect = document.getElementById('subIssueSelect');
+        const searchInput = document.getElementById('searchInput');
 
-const tableBody = document.getElementById("reportsTableBody");
-fetch('/reports')
-.then(res => res.json())
-.then(data => {
-    data.reports.forEach(report => {
-        const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${report.location}</td>
-        <td>${report.time}</td>
-        <td>${report.issue}</td>
-        <td>${report.description}</td>
-        <td>${report.reportedBy}</td>
-    `;
-    tableBody.appendChild(row);
+        sortSelect.addEventListener('change', updateDisplay);
+        issueTypeSelect.addEventListener('change', () => {
+            populateSubIssues(issueTypeSelect.value);
+            updateDisplay();
+        });
+        subIssueSelect.addEventListener('change', updateDisplay);
+        searchInput.addEventListener('input', updateDisplay);
 
-    const [lat, lng] = report.location.split(',').map(coord => parseFloat(coord.trim()));
-    const marker = L.marker([lat, lng]).addTo(map);
-    marker.bindPopup(`<b>Issue:</b> ${report.issue}<br><b>Time:</b> ${report.time}<br><b>Description:</b> ${report.description}<br><b>Reported By:</b> ${report.reportedBy}`);
-    });
-});
+        function displayReports(reports) {
+            reportsContainer.innerHTML = '';
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            reports.forEach(report => {
+                const { location, issueType, issue, urgency, status, description, date, time, username } = report;
+
+                const reportBox = document.createElement('div');
+                reportBox.classList.add('report-box');
+
+                reportBox.innerHTML = `
+                    <div class="report-header">
+                        <b>Issue Type:</b> ${issueType}
+                    </div>
+                    <div class="report-body">
+                        <b>Location:</b> ${location}<br>
+                        <b>Date:</b> ${date} | <b>Time:</b> ${time}<br>
+                        <b>Issue:</b> ${issue}<br>
+                        <b>Description:</b> ${description}<br>
+                    </div>
+                    <div class="report-footer">
+                        <span><b>Status:</b> ${status}</span>
+                        <span><b>Urgency:</b> ${urgency}</span>
+                    </div>
+                    <div class="report-info">
+                        <span><b>Submitted by:</b> ${username}</span>
+                        <a href="https://www.openstreetmap.org/?mlat=${location.split(',')[0]}&mlon=${location.split(',')[1]}" class="map-link" target="_blank">View on Map</a>
+                    </div>
+                `;
+                reportsContainer.appendChild(reportBox);
+
+                const [lat, lon] = location.split(',').map(Number);
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup(`<strong>${issueType}</strong><br>${issue}<br><em>${location}</em>`);
+            });
+        }
+
+        function initIssueTypeDropdown(reports) {
+            const types = Array.from(new Set(reports.map(r => r.issueType)));
+            types.sort();
+            types.forEach(type => {
+                const opt = document.createElement('option');
+                opt.value = type;
+                opt.textContent = type;
+                issueTypeSelect.appendChild(opt);
+            });
+        }
+
+        function populateSubIssues(issueType) {
+            subIssueSelect.innerHTML = `<option value="">-- All Sub-Issues --</option>`;
+            const filtered = allReports.filter(r => r.issueType === issueType);
+            const subIssues = Array.from(new Set(filtered.map(r => r.issue)));
+            subIssues.sort();
+            subIssues.forEach(issue => {
+                const opt = document.createElement('option');
+                opt.value = issue;
+                opt.textContent = issue;
+                subIssueSelect.appendChild(opt);
+            });
+        }
+
+        function updateDisplay() {
+            let filtered = [...allReports];
+
+            const sortValue = sortSelect.value;
+            if (sortValue === 'date') {
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else if (sortValue === 'urgency') {
+                const urgencyOrder = { High: 1, Medium: 2, Low: 3 };
+                filtered.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+            } else if (sortValue === 'status') {
+                filtered.sort((a, b) => a.status.localeCompare(b.status));
+            }
+
+            const issueTypeVal = issueTypeSelect.value;
+            const subIssueVal = subIssueSelect.value;
+            if (issueTypeVal) {
+                filtered = filtered.filter(r => r.issueType === issueTypeVal);
+            }
+            if (subIssueVal) {
+                filtered = filtered.filter(r => r.issue === subIssueVal);
+            }
+
+            const keyword = searchInput.value.toLowerCase();
+            if (keyword) {
+                filtered = filtered.filter(r =>
+                    r.issueType.toLowerCase().includes(keyword) ||
+                    r.issue.toLowerCase().includes(keyword) ||
+                    r.description.toLowerCase().includes(keyword) ||
+                    r.status.toLowerCase().includes(keyword) ||
+                    r.urgency.toLowerCase().includes(keyword) ||
+                    r.location.toLowerCase().includes(keyword)
+                );
+            }
+
+            displayReports(filtered);
+        }
