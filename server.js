@@ -8,6 +8,8 @@ const session = require('express-session');
 const app = express();
 const port = 3000;
 
+const hrefRedirect = '/map.html';
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/')));
@@ -69,7 +71,7 @@ app.post('/register', (req, res) => {
             if (err) {
                 return res.json({ message: 'Account with this username or email already exists' });
             }
-            res.json({ message: 'Registration successful', redirect: '/map.html' });
+            res.json({ message: 'Registration successful', redirect: hrefRedirect });
         });
 });
 
@@ -84,7 +86,7 @@ app.post('/login', (req, res) => {
                 return res.json({ message: 'Error occurred' });
             }
             if (row) {
-                res.json({ message: 'Login successful', redirect: '/map.html' , username: row.username});
+                res.json({ message: 'Login successful', redirect: hrefRedirect, username: row.username});
             } else {
                 res.json({ message: 'Invalid username or password' });
             }

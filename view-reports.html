@@ -6,29 +6,9 @@
     <title>Submitted Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="view-reports.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <style>
-        h1 {
-            color: white;
-            background-color: rgb(22, 87, 136);
-            padding: 20px;
-            font-family: 'Trebuchet MS';
-        }
-        body {
-            font-family: 'Trebuchet MS';
-        }
-        #map {
-            height: 60vh;
-            width: 95%;
-            margin: 20px auto;
-            display: block;
-        }
-        .table-container {
-            width: 95%;
-            margin: 20px auto;
-        }
-    </style>
 </head>
 <body>
 
@@ -53,60 +33,7 @@
     </table>
 </div>
 
-<script>
-    const map = L.map('map', {
-        zoom: 13,
-        minZoom: 4,
-        maxBounds: [
-            [43.579608, -79.639283],
-            [43.855443, -79.113219]
-        ],
-        maxBoundsViscosity: 1.0
-    }).setView([43.7175, -79.4243], 13);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    const reports = 
-    [
-        {
-            location: "43.7000, -79.4200",
-            time: "14:05:23",
-            issue: "Pothole",
-            description: "Pothole near TMU.",
-            reportedBy: "Ranbir Singh Fuddu"
-        },
-        {
-            location: "43.7150, -79.4300",
-            time: "15:10:12",
-            issue: "Car Crash",
-            description: "HELPPPPPPPP.",
-            reportedBy: "Umair Pakistani Puta"
-        }
-    ];
-
-    const tableBody = document.getElementById("reportsTableBody");
-    fetch('/reports')
-    .then(res => res.json())
-    .then(data => {
-        data.reports.forEach(report => {
-            const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${report.location}</td>
-            <td>${report.time}</td>
-            <td>${report.issue}</td>
-            <td>${report.description}</td>
-            <td>${report.reportedBy}</td>
-        `;
-        tableBody.appendChild(row);
-
-        const [lat, lng] = report.location.split(',').map(coord => parseFloat(coord.trim()));
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>Issue:</b> ${report.issue}<br><b>Time:</b> ${report.time}<br><b>Description:</b> ${report.description}<br><b>Reported By:</b> ${report.reportedBy}`);
-        });
-    });
-</script>
+<script src="view-reports.js"></script>
 
 </body>
 </html>

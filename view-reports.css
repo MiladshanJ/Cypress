@@ -1,0 +1,19 @@
+h1 {
+    color: white;
+    background-color: rgb(22, 87, 136);
+    padding: 20px;
+    font-family: 'Trebuchet MS';
+}
+body {
+    font-family: 'Trebuchet MS';
+}
+#map {
+    height: 60vh;
+    width: 95%;
+    margin: 20px auto;
+    display: block;
+}
+.table-container {
+    width: 95%;
+    margin: 20px auto;
+}

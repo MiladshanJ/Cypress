@@ -33,3 +33,41 @@ h1 {
     margin: auto;
     font-size: large;
 }
+
+body {
+    background: linear-gradient(to right, #e3f2fd, #f8f9fa);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-wrapper {
+    max-width: 420px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.tab-content {
+    padding-top: 20px;
+}
+
+.btn-dark {
+    background-color: #343a40;
+    border: none;
+}
+
+.btn-dark:hover {
+    background-color: #23272b;
+}
+
+#message {
+    margin-top: 15px;
+    text-align: center;
+}
