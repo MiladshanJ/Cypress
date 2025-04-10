@@ -28,6 +28,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Register</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab">Admin</button>
+                    </li>
                 </ul>
 
                 <div class="tab-content">
@@ -62,9 +65,23 @@
                             <button class="btn btn-dark" onclick="register()">Register</button>
                         </div>
                     </div>
+                    
+                    <div class="tab-pane fade" id="admin" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label">Admin Username</label>
+                            <input type="text" class="form-control" id="admin-username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="admin-password">
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-danger" onclick="adminlogin()">Admin Login</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="message" class="text-danger"></div>
+                <div id="message" class="text-danger mt-3"></div>
             </div>
         </div>
     </div>

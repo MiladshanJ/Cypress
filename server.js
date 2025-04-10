@@ -114,7 +114,7 @@ app.post('/register', (req, res) => {
                     return res.json({ message: 'verification email sending error' });
                 }
                 console.log('Email sent:', info.response);
-                return res.json({ message: 'verification email sent sucessfully' });
+                return res.json({ message: 'Verification email sent. Please check email.' });
             });
         });
 });
@@ -308,21 +308,20 @@ app.get('/reports',(req, res) => {
 
 //Login admin 
 app.post('/admin-login', (req, res) => {
-    const { username, password, email } = req.body;
+    const { username, password } = req.body;
+    const hashedPassword = hashPassword(password); 
 
-    db.get('SELECT * FROM admins WHERE username = ?',
-        [username],
-        (err, row) => {  
-            if (err) return res.status(500).json({ error: err.message }); 
-            if (!row) return res.status(401).json({ error: "Invalid credentials" });  
-
-            const hashedPassword = hashPassword(password);  
-            if (hashedPassword !== row.password) { 
-                return res.status(401).json({ error: "Invalid credentials" });  
+    db.get(`SELECT * FROM admins WHERE username = ? AND password = ?`, 
+        [username, hashedPassword], 
+        (err, row) => {
+            if (err) {
+                return res.json({ message: 'Error occurred' });
             }
-            res.status(200).json({message: "Successful Login", admin: row});
-        } 
-    );
+            if (!row) {
+                return res.json({ message: 'Invalid username or password' });
+            }
+            return res.json({ message: 'Login successful', redirect: 'http://localhost:3000/admin.html', username: row.username });
+        });
 });
 
 //Delete Report
