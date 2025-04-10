@@ -1,3 +1,42 @@
+const issueIcons = {
+    infrastructure: L.icon({
+        iconUrl: '/icons/infrastructure.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    utility: L.icon({
+        iconUrl: '/icons/utility.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    sanitation: L.icon({
+        iconUrl: '/icons/sanitation.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    environment: L.icon({
+        iconUrl: '/icons/environment.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    traffic: L.icon({
+        iconUrl: '/icons/traffic.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    duplicate: L.icon({
+        iconUrl: '/icons/dup.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    })
+};
+
 fetch('/current-reports')
     .then(res => res.json())
     .then(data => {
@@ -28,7 +67,8 @@ function createGroupedReportBox(group) {
     const reportBox = document.createElement('div');
     reportBox.className = 'report-box';
 
-    let groupDetails = `<div class="report-info"><strong>Reports in this group:</strong> ${group.length}</div>`;
+    let groupDetails = `<div id="map-${group[0].id}" class="map"></div>
+                        <div class="report-info"><strong>Reports in this group:</strong> ${group.length}</div>`;
 
     
     group.forEach((report, index) => {
@@ -72,7 +112,14 @@ function createGroupedReportBox(group) {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            L.marker([lat, lng]).addTo(map);
+            var selectedIcon;
+
+            if(group[0].status === "Duplicate"){
+                selectedIcon = issueIcons.duplicate;
+            } else {
+                selectedIcon = issueIcons[group[0].issueType];
+            }
+            L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
         } else {
             console.error("Map container not found:", `map-${group[0].id}`);
         }
@@ -123,8 +170,14 @@ function createReportBox(report) {
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
+            var selectedIcon;
 
-            L.marker([lat, lng]).addTo(map);
+            if(report.status === "Duplicate"){
+                selectedIcon = issueIcons.duplicate;
+            } else {
+                selectedIcon = issueIcons[report.issueType];
+            }
+            L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
         } else {
             console.error("Map container not found:", mapId);
         }

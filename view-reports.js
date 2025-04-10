@@ -1,4 +1,10 @@
-const map = L.map('map').setView([43.65107, -79.347015], 11);
+var map = L.map('map', {
+    zoom: 12,
+    minZoom: 12,
+    maxZoom: 18,
+    maxBounds: [ [43.579608, -79.639283], [43.855443, -79.113219] ],
+    maxBoundsViscosity: 1.0,
+}).setView([43.7175, -79.4243], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
