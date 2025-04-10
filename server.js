@@ -233,13 +233,13 @@ app.post('/update-status', (req, res) => {
                 return res.status(500).json({ message: 'Failed to update status' });
             }
 
-            db.all('Select users.email FROM subscriptions JOIN users ON subscriptions.username = users.username WHERE subscriptions.reportId = ?', [reportId], (err, row) => {
+            db.all('Select users.email FROM subscriptions JOIN users ON subscriptions.username = users.username WHERE subscriptions.reportId = ?', [reportId], (err, rows) => {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).json({ message: 'Failed to fetch subscribers' });
                 }
 
-                if (row.length === 0) {
+                if (rows.length === 0) {
                     return res.status(200).json({ message: 'Status updated, no subscribers to notify' });
                 }
 
@@ -349,33 +349,3 @@ app.delete('/delete/:id', (req, res) => {
         res.status(200).json({ message: 'Report deleted successfully' });
     });
 });
-
-//Set Report to In Progress
-app.post('/set-in-progress', (req, res) => {
-    const {reportId} = req.body;
-    
-    db.get('SELECT * FROM reports WHERE id = ?', [reportId], (err, rows) => {
-        db.run('UPDATE reports SET status = ? WHERE id = ?', ['In Progress', reportId], function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Failed to update status' });
-            }
-
-            res.status(200).json({ message: 'Status updated to In Progress' });
-        });
-    });
-});
-
-//Set Report to Resolved
-app.post('/set-resolved', (req, res) => {
-    const {reportId} = req.body;
-    
-    db.get('SELECT * FROM reports WHERE id = ?', [reportId], (err, rows) => {
-        db.run('UPDATE reports SET status = ? WHERE id = ?', ['Resolved', reportId], function(err) {
-            if (err) {
-                return res.status(500).json({ message: 'Failed to update status' });
-            }
-
-            res.status(200).json({ message: 'Status updated to Resolved' });
-        });
-    });
-}); 

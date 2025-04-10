@@ -193,21 +193,22 @@ function deleteReport(reportId) {
 }
 
 function resolveReport(reportId) {
-    fetch('/set-resolved', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ reportId })})
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message || "Report marked as resolved.");
-        window.location.reload();
-    })
-    .catch(err => console.error("Error resolving report:", err));
+    changeStatus(reportId, 'Resolved');
 }
 
 function setInProgress(reportId) {
-    fetch('/set-in-progress', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ reportId })})
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message || "Report marked as in progress.");
-        window.location.reload();
+    changeStatus(reportId, 'In Progress');
+}
+
+function changeStatus(reportId, status) {
+    fetch('/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json',},
+        body: JSON.stringify({ reportId, newStatus: status }),
     })
-    .catch(err => console.error("Error sertting report in progress:", err));
+    .then(response => response.json())
+    .then(data => { 
+        alert(data.message);
+        location.reload();
+    })
 }
