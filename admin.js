@@ -1,32 +1,63 @@
 fetch('/reports')
     .then(res => res.json())
     .then(data => {
+        console.log("Fetched Reports: ", data.reports);
+        
         const container = document.getElementById('reportContainer');
-        data.reports.forEach((report, index) => {
-            const reportBox = document.createElement('div');
-            reportBox.className = 'report-box';
+        
+        if (data.reports && data.reports.length > 0) {
+            const reportGroups = groupReportsByDuplicate(data.reports);
+            console.log("Grouped Reports: ", reportGroups); 
 
-            const mapId = `map-${index}`;
-            reportBox.innerHTML = `
-                <div id="${mapId}" class="map"></div>
-                <div class="report-info"><strong>Issue:</strong> ${report.issue}</div>
-                <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
-                <div class="report-info"><strong>Description:</strong> ${report.description}</div>
-                <div class="report-info"><strong>Status:</strong> ${report.status}</div>
-                <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
-                <div class="report-info"><strong>Date:</strong> ${report.date}</div>
-                <div class="report-info"><strong>Time:</strong> ${report.time}</div>
-                <div class="report-info"><strong>Location:</strong> ${report.location}</div>
-                <div class="report-buttons">
-                    <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
-                    <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
-                </div>
-            `;
+            reportGroups.forEach(group => {
+                if (group.length > 1) {
+                    const reportBox = createGroupedReportBox(group);
+                    container.appendChild(reportBox);
+                } else {
+                    const reportBox = createReportBox(group[0]);
+                    container.appendChild(reportBox);
+                }
+            });
+        } else {
+            console.error("No reports found or reports are empty.");
+        }
+    })
+    .catch(err => console.error("Error fetching reports:", err));
 
-            container.appendChild(reportBox);
+function createGroupedReportBox(group) {
+    const reportBox = document.createElement('div');
+    reportBox.className = 'report-box';
 
-            const [lat, lng] = report.location.split(',').map(coord => parseFloat(coord.trim()));
-            const map = L.map(mapId, {
+    let groupDetails = `<div class="report-info"><strong>Reports in this group:</strong> ${group.length}</div>`;
+
+    
+    group.forEach((report, index) => {
+        const label = index === 0 ? "Main Report" : `Duplicate ${index}`;
+        groupDetails += `
+            <div class="duplicate-info"><strong>${label}:</strong></div>
+            <div class="report-info"><strong>Issue:</strong> ${report.issue}</div>
+            <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
+            <div class="report-info"><strong>Description:</strong> ${report.description}</div>
+            <div class="report-info"><strong>Status:</strong> ${report.status}</div>
+            <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
+            <div class="report-info"><strong>Date:</strong> ${report.date}</div>
+            <div class="report-info"><strong>Time:</strong> ${report.time}</div>
+            <div class="report-info"><strong>Location:</strong> ${report.location}</div>
+            <div class="report-buttons">
+                <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
+                <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
+            </div>
+        `;
+    });
+
+    reportBox.innerHTML = groupDetails;
+
+    
+    setTimeout(() => {
+        const mapContainer = document.getElementById(`map-${group[0].id}`);
+        if (mapContainer) {
+            const [lat, lng] = group[0].location.split(',').map(coord => parseFloat(coord.trim()));
+            const map = L.map(mapContainer, {
                 zoomControl: false,
                 dragging: false,
                 scrollWheelZoom: false,
@@ -41,8 +72,115 @@ fetch('/reports')
             }).addTo(map);
 
             L.marker([lat, lng]).addTo(map);
-        });
+        } else {
+            console.error("Map container not found:", `map-${group[0].id}`);
+        }
+    }, 0);
+
+    return reportBox;
+}
+
+function createReportBox(report) {
+    const reportBox = document.createElement('div');
+    reportBox.className = 'report-box';
+
+    const mapId = `map-${report.id}`;
+
+    let reportDetails = `
+        <div id="${mapId}" class="map"></div>
+        <div class="report-info"><strong>Issue:</strong> ${report.issue}</div>
+        <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
+        <div class="report-info"><strong>Description:</strong> ${report.description}</div>
+        <div class="report-info"><strong>Status:</strong> ${report.status}</div>
+        <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
+        <div class="report-info"><strong>Date:</strong> ${report.date}</div>
+        <div class="report-info"><strong>Time:</strong> ${report.time}</div>
+        <div class="report-info"><strong>Location:</strong> ${report.location}</div>
+        <div class="report-buttons">
+            <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
+            <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
+        </div>
+    `;
+
+    reportBox.innerHTML = reportDetails;
+
+    setTimeout(() => {
+        const mapContainer = document.getElementById(mapId);
+        if (mapContainer) {
+            const [lat, lng] = report.location.split(',').map(coord => parseFloat(coord.trim()));
+            const map = L.map(mapContainer, {
+                zoomControl: false,
+                dragging: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false,
+                keyboard: false,
+                tap: false
+            }).setView([lat, lng], 14);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map);
+        } else {
+            console.error("Map container not found:", mapId);
+        }
+    }, 0);
+
+    return reportBox;
+}
+
+function groupReportsByDuplicate(reports) {
+    const groupedReports = [];
+
+    reports.forEach(report => {
+        let foundGroup = false;
+
+        for (let group of groupedReports) {
+            const firstReport = group[0];
+            if (
+                firstReport.issueType === report.issueType && 
+                firstReport.issue === report.issue &&
+                calculateDistance(firstReport.location, report.location) <= 150
+            ) {
+                group.push(report);  // Add to the existing group
+                foundGroup = true;
+                break;
+            }
+        }
+
+        // If no group was found, create a new group
+        if (!foundGroup) {
+            groupedReports.push([report]);
+        }
     });
+
+    return groupedReports;
+}
+
+// Haversine formula to calculate the distance between two points (in meters)
+function calculateDistance(loc1, loc2) {
+    const [lat1, lon1] = loc1.split(',').map(coord => parseFloat(coord.trim()));
+    const [lat2, lon2] = loc2.split(',').map(coord => parseFloat(coord.trim()));
+
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = degToRad(lat2 - lat1);
+    const dLon = degToRad(lon2 - lon1);
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) * 
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c * 1000; // Distance in meters
+
+    return distance;
+}
+
+// Function to convert degrees to radians
+function degToRad(deg) {
+    return deg * (Math.PI / 180);
+}
 
 function deleteReport(reportId) {
     fetch(`/delete/${reportId}`, { method: 'DELETE' })
