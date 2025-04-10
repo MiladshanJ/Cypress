@@ -187,39 +187,41 @@ app.post('/update-status', (req, res) => {
             return res.status(404).json({ message: 'Report not found' });
         }
 
-        db.all('SELECT u.email FROM subscriptions s JOIN users u ON s.username = u.username WHERE s.reportId = ?', 
-            [reportId], 
-            (err, subscribers) => {
+        db.run('UPDATE reports SET status = ? WHERE id = ?', [newStatus, reportId], function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Failed to update status' });
+            }
+
+            db.all('Select users.email FROM subscriptions JOIN users ON subscriptions.username = users.username WHERE subscriptions.reportId = ?', [reportId], (err, row) => {
                 if (err) {
                     console.error(err.message);
                     return res.status(500).json({ message: 'Failed to fetch subscribers' });
                 }
-        
-                if (subscribers.length === 0) {
+
+                if (rows.length === 0) {
                     return res.status(200).json({ message: 'Status updated, no subscribers to notify' });
                 }
-        
-                const emailList = subscribers.map(sub => sub.email).join(',');
-        
+
+                const emails = rows.map(row => row.email).join(',');
+
                 const mail = {
                     from: 'cypress.update.notification@gmail.com',
-                    to: emailList,
-                    subject: 'Report Status Update',
+                    to: emails,
+                    subject: 'Report Update Notification',
                     html: `<p>The status of the report "<strong>${report.issue}</strong>" has been changed to <strong>${newStatus}</strong>.</p>
                            <p><a href="http://localhost:3000/map.html">View the report</a></p>`
                 };
-        
+
                 transporter.sendMail(mail, (error, info) => {
                     if (error) {
                         console.error('Email sending failed:', error);
-                        return res.status(500).json({ message: 'Status updated but email failed' });
+                        return res.json({ message: 'Status updated, email failed sending error' });
                     }
-        
-                    console.log('Notification emails sent:', info.response);
-                    res.status(200).json({ message: 'Status updated and subscribers notified' });
+                    console.log('Email sent:', info.response);
+                    return res.json({ message: 'Status update and email sent successfully to subscribers' });
                 });
-            }
-        );
+            });
+        });
     });
 });
 
@@ -281,19 +283,3 @@ app.post('/admin-login', (req, res) => {
         } 
     );
 });
-
-//Delete Report
-app.delete('/delete/:id', (req, res) => {
-    const reportId = req.params.id;
-
-    db.run('DELETE FROM reports WHERE id = ?', [reportId], function(err) {
-        if (err){
-            console.error(err.message);
-            return res.status(500).json({error: 'Failed to delete report' });
-        }
-        if (this.changes === 0){
-            return res.status(404).json({ error: 'Report not found' });
-        }
-        res.status(200).json({ message: 'Report deleted successfully' });
-    });
-})
