@@ -121,7 +121,7 @@ app.post('/submit-report', (req, res) => {
         const duplicate = rows.find(row => {
             const [lat2, lon2] = row.location.split(',').map(coord => parseFloat(coord.trim()));
             const distance = getDistance(lat1, lon1, lat2, lon2);
-            return distance <= 406;
+            return distance <= 169;
         });
         if (duplicate) {
             reportStatus = "Duplicate";

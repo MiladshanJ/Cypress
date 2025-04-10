@@ -13,36 +13,36 @@ attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreet
 const issueIcons = {
     infrastructure: L.icon({
         iconUrl: 'icons/infrastructure.png',
-        iconSize: [30, 30], 
+        iconSize: [60, 60], 
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
     }),
     utility: L.icon({
-        iconUrl: 'icons/utility.png',
-        iconSize: [30, 30],
+        iconUrl: '/icons/utility.png',
+        iconSize: [60, 60],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
     }),
     sanitation: L.icon({
-        iconUrl: 'icons/sanitation.png',
-        iconSize: [30, 30],
+        iconUrl: '/icons/sanitation.png',
+        iconSize: [60, 60],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
     }),
     environment: L.icon({
-        iconUrl: 'icons/environment.png',
-        iconSize: [30, 30],
+        iconUrl: '/icons/environment.png',
+        iconSize: [60, 60],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
     }),
     traffic: L.icon({
-        iconUrl: 'icons/traffic.png',
-        iconSize: [30, 30],
+        iconUrl: '/icons/traffic.png',
+        iconSize: [60, 60],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
     }),
     duplicate: L.icon({
-        iconUrl: 'icons/dup.png',
+        iconUrl: '/icons/dup.png',
         iconSize: [60, 60],
         iconAnchor: [15, 30],
         popupAnchor: [0, -30]
@@ -184,7 +184,9 @@ document.querySelector("form").addEventListener("submit",function(event) {
     })
     .then(res => res.json())
     .then(data =>{
-        let marker = L.marker([lat, lng]).addTo(map);
+        var selectedIcon = issueIcons[data.issueType]
+        
+        let marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
         marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.status}<br><b>Description:</b> ${description}`);
     })
     .catch(err => {
