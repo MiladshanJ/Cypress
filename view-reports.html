@@ -11,14 +11,20 @@
 </head>
 
 <body>
-    <h1><b>Submitted Reports</b></h1>
+    <div class="topnav">
+        <div class="logo"><strong>Submitted Reports</strong></div>
+        <div class="nav-links">
+            <a href="map.html"><strong>Home</strong></a>
+            <a class="active"><strong>View Reports</strong></a>
+        </div>
+    </div>
 
     <div class="container mb-4">
         <div class="row g-2">
             <div class="col-md-3">
                 <label>Sort by:</label>
                 <select id="sortSelect" class="form-select">
-                    <option value="">-- Select --</option>
+                    <option value="">Select</option>
                     <option value="date">Date</option>
                     <option value="urgency">Urgency</option>
                     <option value="status">Status</option>
@@ -27,13 +33,13 @@
             <div class="col-md-3">
                 <label>Filter by Issue Type:</label>
                 <select id="issueTypeSelect" class="form-select">
-                    <option value="">-- All Types --</option>
+                    <option value="">All Types</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Filter by Sub-Issue:</label>
                 <select id="subIssueSelect" class="form-select">
-                    <option value="">-- All Sub-Issues --</option>
+                    <option value="">All Sub-Issues</option>
                 </select>
             </div>
             <div class="col-md-3">
