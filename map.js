@@ -165,6 +165,7 @@ document.querySelector("form").addEventListener("submit",function(event) {
     let issueType = document.getElementById("issueType").value;
     let urgency = document.getElementById("urgency").value;
     let username = localStorage.getItem("username");
+    let subscribed = document.getElementById("subscribe").checked;
 
     fetch('/submit-report', {
         method: 'POST',
@@ -187,7 +188,22 @@ document.querySelector("form").addEventListener("submit",function(event) {
         var selectedIcon = issueIcons[data.issueType];
         
         let marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
-        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${report.status}<br><b>Description:</b> ${description}`);
+        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.status}<br><b>Description:</b> ${description}`);
+
+        if (subscribed && data.id && username) {
+            fetch('/subscribe', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json' },
+                body: JSON.stringify({ reportId: data.id, username })
+            })
+            .then(res => res.json())
+            .then(subscribeRes => {
+                console.log("Subscribed to updates:", subscribeRes);
+            })
+            .catch(err => {
+                console.error("Subscription failed:", err);
+            });
+        }
     })
     .catch(err => {
         console.error("Failed to submit report:", err);

@@ -166,9 +166,50 @@ app.post('/submit-report', (req, res) => {
             [location, date, time, issueType, issue, urgency, reportStatus, description, username],
             function (err) {
                 if (err) return res.status(500).json({ error: err.message });
-                res.status(200).json({
-                    id: this.lastID,
-                    location, date, time, issueType, issue, urgency, reportStatus, description
+
+                const reportId = this.lastID;
+
+                db.get('SELECT email FROM users WHERE username = ?', [username], (err, userRow) => {
+                    if (err || !userRow) {
+                        console.error('Error getting user email:', err);
+                        return res.status(500).json({ message: 'Report saved but email failed.' });
+                    }
+
+                    const userEmail = userRow.email;
+
+                    const mail = {
+                        from: 'cypress.update.notification@gmail.com',
+                        to: userEmail,
+                        subject: 'Report Confirmation - Cypress System',
+                        html: `<p>Hi <strong>${username}</strong>,</p>
+                            <p>Your report has been successfully submitted with the following details:</p>
+                            <ul>
+                                <li><strong>Report ID:</strong> ${reportId}</li>
+                                <li><strong>Location:</strong> ${location}</li>
+                                <li><strong>Date:</strong> ${date}</li>
+                                <li><strong>Time:</strong> ${time}</li>
+                                <li><strong>Issue Type:</strong> ${issueType}</li>
+                                <li><strong>Issue:</strong> ${issue}</li>
+                                <li><strong>Urgency:</strong> ${urgency}</li>
+                                <li><strong>Status:</strong> ${reportStatus}</li>
+                                <li><strong>Description:</strong> ${description}</li>
+                            </ul>
+                            <p>Thank you for submitting a report through Cypress.</p>
+                            <p>You can view the report on the map <a href="http://localhost:3000/map.html">here</a></p> `
+                    };
+
+                    transporter.sendMail(mail, (error, info) => {
+                        if (error) {
+                            console.error('Confirmation email failed:', error);
+                        } else {
+                            console.log('Confirmation email sent:', info.response);
+                        }
+                    });
+    
+                    res.status(200).json({
+                        id: reportId,
+                        location, date, time, issueType, issue, urgency, reportStatus, description
+                    });
                 });
             }
         );
@@ -198,7 +239,7 @@ app.post('/update-status', (req, res) => {
                     return res.status(500).json({ message: 'Failed to fetch subscribers' });
                 }
 
-                if (rows.length === 0) {
+                if (row.length === 0) {
                     return res.status(200).json({ message: 'Status updated, no subscribers to notify' });
                 }
 
@@ -226,9 +267,9 @@ app.post('/update-status', (req, res) => {
 });
 
 app.post('/subscribe', (req, res) => {
-    const { reportID, username } = req.body;
+    const { reportId, username } = req.body;
 
-    db.run('INSERT INTO subscriptions (reportId, username) VALUES (?, ?)', [reportID, username], function(err) {
+    db.run('INSERT INTO subscriptions (reportId, username) VALUES (?, ?)', [reportId, username], function(err) {
         if (err) {
             console.error(err.message);
             return res.status(500).json({ message: 'Failed to subscribe or already subscribed' });
