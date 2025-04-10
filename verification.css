@@ -1,0 +1,19 @@
+body {
+    background: linear-gradient(to right, #e3f2fd, #f8f9fa);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-wrapper {
+    max-width: 420px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 15px;
+}
