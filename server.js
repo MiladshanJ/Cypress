@@ -4,9 +4,18 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 const session = require('express-session');
+const mailer = require('nodemailer');
 
 const app = express();
 const port = 3000;
+
+const transporter = mailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user:'cypress.update.notification@gmail.com',
+        pass:'lsca whdz ucor njye',
+    },
+});
 
 const hrefRedirect = '/map.html';
 
@@ -31,6 +40,7 @@ app.listen(port, () => {
 let user;
 let report;
 let admin;
+let subscription;
 
 const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) return console.error(err.message);
@@ -38,7 +48,7 @@ const db = new sqlite3.Database("./cypress.db", sqlite3.OPEN_READWRITE | sqlite3
 });
 
 // Create Tables 
-user = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
+user = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE, token TEXT, verified BOOLEAN DEFAULT FALSE)';
 db.run(user);
 
 report = 'CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, location TEXT, date TEXT, time TEXT, issueType TEXT, issue TEXT, urgency TEXT, status TEXT, description TEXT, username TEXT)';
@@ -47,6 +57,8 @@ db.run(report);
 admin = 'CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, email TEXT UNIQUE)';
 db.run(admin);
 
+subscription = 'CREATE TABLE IF NOT EXISTS subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT, reportId INTEGER, username TEXT, FOREIGN KEY (reportId) REFERENCES reports(id), FOREIGN KEY (username) REFERENCES users(username))';
+db.run(subscription);
 
 // Hash Function SHA-256
 function hashPassword(password){
@@ -75,18 +87,35 @@ function getDistance(lat1, lon1, lat2, lon2){
 app.post('/register', (req, res) => {
     const { username, password, email } = req.body;
     const hashedPassword = hashPassword(password);
+    const token = crypto.randomBytes(32).toString('hex');
 
     if (!username || !password) {
         return res.json({ message: 'Username and password are required' });
     }
     
-    db.run(`INSERT INTO users (username, password, email) VALUES (?, ?, ?)`, 
-        [username, hashedPassword, email], 
+    db.run(`INSERT INTO users (username, password, email, token, verified) VALUES (?, ?, ?, ?, FALSE)`, 
+        [username, hashedPassword, email, token], 
         function(err) {
             if (err) {
                 return res.json({ message: 'Account with this username or email already exists' });
             }
-            res.json({ message: 'Registration successful', redirect: hrefRedirect });
+
+            const mail = {
+                from: 'cypress.update.notification@gmail.com',
+                to: email,
+                subject: 'Verify your Cypress Account Email',
+                html: `<p>Click the link to verify your email:</p>
+               http://localhost:3000/verification.html?token=${token}`
+            }
+
+            transporter.sendMail(mail, (error, info) => {
+                if (error) {
+                    console.error('Email sending failed:', error);
+                    return res.json({ message: 'verification email sending error' });
+                }
+                console.log('Email sent:', info.response);
+                return res.json({ message: 'verification email sent sucessfully' });
+            });
         });
 });
 
@@ -100,11 +129,16 @@ app.post('/login', (req, res) => {
             if (err) {
                 return res.json({ message: 'Error occurred' });
             }
-            if (row) {
-                res.json({ message: 'Login successful', redirect: hrefRedirect, username: row.username});
-            } else {
-                res.json({ message: 'Invalid username or password' });
+
+            if (!row) {
+                return res.json({ message: 'Invalid username or password' });
             }
+
+            if (!row.verified) {
+                return res.json({ message: 'Please verify your email before logging in.' });
+            }
+
+            return res.json({ message: 'Login successful', redirect: hrefRedirect, username: row.username });
         });
 });
 
@@ -139,6 +173,82 @@ app.post('/submit-report', (req, res) => {
             }
         );
     });
+});
+
+app.post('/update-status', (req, res) => {
+    const { reportId, newStatus } = req.body;
+
+    if (!reportId || !newStatus) {
+        return res.status(400).json({ message: 'Missing reportId or newStatus' });
+    }
+
+    db.get('SELECT * FROM reports WHERE id = ?', [reportId], (err, report) => {
+        if (err || !report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+
+        db.all('SELECT u.email FROM subscriptions s JOIN users u ON s.username = u.username WHERE s.reportId = ?', 
+            [reportId], 
+            (err, subscribers) => {
+                if (err) {
+                    console.error(err.message);
+                    return res.status(500).json({ message: 'Failed to fetch subscribers' });
+                }
+        
+                if (subscribers.length === 0) {
+                    return res.status(200).json({ message: 'Status updated, no subscribers to notify' });
+                }
+        
+                const emailList = subscribers.map(sub => sub.email).join(',');
+        
+                const mail = {
+                    from: 'cypress.update.notification@gmail.com',
+                    to: emailList,
+                    subject: 'Report Status Update',
+                    html: `<p>The status of the report "<strong>${report.issue}</strong>" has been changed to <strong>${newStatus}</strong>.</p>
+                           <p><a href="http://localhost:3000/map.html">View the report</a></p>`
+                };
+        
+                transporter.sendMail(mail, (error, info) => {
+                    if (error) {
+                        console.error('Email sending failed:', error);
+                        return res.status(500).json({ message: 'Status updated but email failed' });
+                    }
+        
+                    console.log('Notification emails sent:', info.response);
+                    res.status(200).json({ message: 'Status updated and subscribers notified' });
+                });
+            }
+        );
+    });
+});
+
+app.post('/subscribe', (req, res) => {
+    const { reportID, username } = req.body;
+
+    db.run('INSERT INTO subscriptions (reportId, username) VALUES (?, ?)', [reportID, username], function(err) {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: 'Failed to subscribe or already subscribed' });
+        }
+        res.status(200).json({ message: 'Subscribed successfully' });
+    }
+    );
+});
+
+app.get('/verify', (req, res) => {
+    const token = req.query.token;
+    if (!token) return res.send('Invalid token');
+
+    db.get('SELECT * FROM users WHERE token = ?', [token], (err,user) => {
+        if (err || !user) return res.send('Invalid or expired token');
+
+        db.run('UPDATE users SET verified = TRUE, token = NULL WHERE id = ?', [user.id], (err) => {
+            if (err) return res.send('verificatio updating error');
+            res.send('email verified');
+        });
+    });
+
 });
 
 //Display all Reports
