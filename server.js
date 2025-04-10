@@ -171,3 +171,19 @@ app.post('/admin-login', (req, res) => {
         } 
     );
 });
+
+//Delete Report
+app.delete('/delete/:id', (req, res) => {
+    const reportId = req.params.id;
+
+    db.run('DELETE FROM reports WHERE id = ?', [reportId], function(err) {
+        if (err){
+            console.error(err.message);
+            return res.status(500).json({error: 'Failed to delete report' });
+        }
+        if (this.changes === 0){
+            return res.status(404).json({ error: 'Report not found' });
+        }
+        res.status(200).json({ message: 'Report deleted successfully' });
+    });
+})

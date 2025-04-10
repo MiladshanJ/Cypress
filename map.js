@@ -141,7 +141,7 @@ function addMarker(e) {
     var date = new Date();
     currentCoord = e.latlng;
 
-    document.getElementById("location").value = e.latlng.lat.toFixed(9) + ", " + e.latlng.lng.toFixed(9);
+    document.getElementById("location").value = e.latlng.lat + ", " + e.latlng.lng;
     document.getElementById("time").value = date.getHours().toString().padStart(2,0) + ":" + date.getMinutes().toString().padStart(2,0) + ":" + date.getSeconds().toString().padStart(2,0);
     document.getElementById("date").value = date.getFullYear().toString() + "-" + (date.getMonth()+1).toString().padStart(2,0) + "-" + date.getDate().toString().padStart(2,0);
     show();
@@ -184,7 +184,7 @@ document.querySelector("form").addEventListener("submit",function(event) {
     })
     .then(res => res.json())
     .then(data =>{
-        var selectedIcon = issueIcons[data.issueType]
+        var selectedIcon = issueIcons[data.issueType];
         
         let marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
         marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.status}<br><b>Description:</b> ${description}`);

@@ -45,7 +45,7 @@ fetch('/reports')
     });
 
 function deleteReport(reportId) {
-    fetch(`/reports/${reportId}`, { method: 'DELETE' })
+    fetch(`/delete/${reportId}`, { method: 'DELETE' })
         .then(res => res.json())
         .then(data => {
             alert("Report deleted successfully.");
