@@ -50,7 +50,7 @@ const issueIcons = {
 };
 
 
-fetch('/reports')
+fetch('/current-reports')
     .then(res => res.json())
     .then(data => {
         data.reports.forEach(report => {

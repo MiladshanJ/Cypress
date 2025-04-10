@@ -146,7 +146,7 @@ app.post('/login', (req, res) => {
 app.post('/submit-report', (req, res) => {
     const {location, date, time, issueType, issue, urgency, description, username} = req.body;
 
-    let reportStatus = "Open";
+    let reportStatus = "Pending";
     const [lat1, lon1] = location.split(',').map(coord => parseFloat(coord.trim()));
 
     //Duplicate Check - Version 1
@@ -305,6 +305,16 @@ app.get('/reports',(req, res) => {
     })
 }) 
 
+//Display Non-Resolved Reports
+app.get('/current-reports',(req, res) => {
+    db.all('SELECT * FROM reports WHERE status != ?', ['Resolved'], (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            return res.status(500).json({ status: 'error', message: 'Failed to fetch reports' });
+        }
+        res.status(200).json({ status: 'success', reports: rows });
+    })
+}) 
 
 //Login admin 
 app.post('/admin-login', (req, res) => {
@@ -339,3 +349,33 @@ app.delete('/delete/:id', (req, res) => {
         res.status(200).json({ message: 'Report deleted successfully' });
     });
 });
+
+//Set Report to In Progress
+app.post('/set-in-progress', (req, res) => {
+    const {reportId} = req.body;
+    
+    db.get('SELECT * FROM reports WHERE id = ?', [reportId], (err, rows) => {
+        db.run('UPDATE reports SET status = ? WHERE id = ?', ['In Progress', reportId], function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Failed to update status' });
+            }
+
+            res.status(200).json({ message: 'Status updated to In Progress' });
+        });
+    });
+});
+
+//Set Report to Resolved
+app.post('/set-resolved', (req, res) => {
+    const {reportId} = req.body;
+    
+    db.get('SELECT * FROM reports WHERE id = ?', [reportId], (err, rows) => {
+        db.run('UPDATE reports SET status = ? WHERE id = ?', ['Resolved', reportId], function(err) {
+            if (err) {
+                return res.status(500).json({ message: 'Failed to update status' });
+            }
+
+            res.status(200).json({ message: 'Status updated to Resolved' });
+        });
+    });
+}); 

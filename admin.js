@@ -1,4 +1,4 @@
-fetch('/reports')
+fetch('/current-reports')
     .then(res => res.json())
     .then(data => {
         console.log("Fetched Reports: ", data.reports);
@@ -45,6 +45,7 @@ function createGroupedReportBox(group) {
             <div class="report-info"><strong>Location:</strong> ${report.location}</div>
             <div class="report-buttons">
                 <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
+                <button class="btn in-progress" onclick="setInProgress(${report.id})">Set In Progress</button>
                 <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
             </div>
         `;
@@ -98,6 +99,7 @@ function createReportBox(report) {
         <div class="report-info"><strong>Location:</strong> ${report.location}</div>
         <div class="report-buttons">
             <button class="delete-btn" onclick="deleteReport(${report.id})">Delete</button>
+            <button class="btn in-progress" onclick="setInProgress(${report.id})">Set In Progress</button>
             <button class="btn resolve" onclick="resolveReport(${report.id})">Resolve</button>
         </div>
     `;
@@ -144,13 +146,12 @@ function groupReportsByDuplicate(reports) {
                 firstReport.issue === report.issue &&
                 calculateDistance(firstReport.location, report.location) <= 150
             ) {
-                group.push(report);  // Add to the existing group
+                group.push(report);
                 foundGroup = true;
                 break;
             }
         }
 
-        // If no group was found, create a new group
         if (!foundGroup) {
             groupedReports.push([report]);
         }
@@ -159,7 +160,7 @@ function groupReportsByDuplicate(reports) {
     return groupedReports;
 }
 
-// Haversine formula to calculate the distance between two points (in meters)
+
 function calculateDistance(loc1, loc2) {
     const [lat1, lon1] = loc1.split(',').map(coord => parseFloat(coord.trim()));
     const [lat2, lon2] = loc2.split(',').map(coord => parseFloat(coord.trim()));
@@ -172,12 +173,11 @@ function calculateDistance(loc1, loc2) {
         Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) * 
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c * 1000; // Distance in meters
+    const distance = R * c * 1000; 
 
     return distance;
 }
 
-// Function to convert degrees to radians
 function degToRad(deg) {
     return deg * (Math.PI / 180);
 }
@@ -190,4 +190,24 @@ function deleteReport(reportId) {
             window.location.reload();
         })
         .catch(err => console.error("Error deleting report:", err));
+}
+
+function resolveReport(reportId) {
+    fetch('/set-resolved', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ reportId })})
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message || "Report marked as resolved.");
+        window.location.reload();
+    })
+    .catch(err => console.error("Error resolving report:", err));
+}
+
+function setInProgress(reportId) {
+    fetch('/set-in-progress', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ reportId })})
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message || "Report marked as in progress.");
+        window.location.reload();
+    })
+    .catch(err => console.error("Error sertting report in progress:", err));
 }
