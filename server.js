@@ -53,6 +53,21 @@ function hashPassword(password){
     return crypto.createHash('sha256').update(password).digest('hex');
 }
 
+function getDistance(lat1, lon1, lat2, lon2){
+    const radiusWorld = 6371e3; 
+    const toRad = x => x * Math.PI / 180;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return radiusWorld * c;    
+}
+
 
 // ROUTES
 
@@ -95,14 +110,35 @@ app.post('/login', (req, res) => {
 
 //Submit Report
 app.post('/submit-report', (req, res) => {
-    const {location, date, time, issueType, issue, urgency, reportStatus, description, username} = req.body;
-    
-    db.run('INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [location, JSON.stringify(date), JSON.stringify(time), issueType, issue, urgency, reportStatus, JSON.stringify(description), username],
-        function(err) {
-            if (err) return res.status(500).json({error: err.message});
-            res.status(200).json({id: this.lastID, location, date, time, issueType, issue, urgency, reportStatus, description});
+    const {location, date, time, issueType, issue, urgency, description, username} = req.body;
+
+    let reportStatus = "Open";
+    const [lat1, lon1] = location.split(',').map(coord => parseFloat(coord.trim()));
+
+    //Duplicate Check - Version 1
+    db.all('SELECT * FROM reports WHERE issueType = ? AND issue = ?', [issueType, issue], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const duplicate = rows.find(row => {
+            const [lat2, lon2] = row.location.split(',').map(coord => parseFloat(coord.trim()));
+            const distance = getDistance(lat1, lon1, lat2, lon2);
+            return distance <= 406;
+        });
+        if (duplicate) {
+            reportStatus = "Duplicate";
         }
-    );
+
+        db.run(
+            'INSERT INTO reports (location, date, time, issueType, issue, urgency, status, description, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [location, date, time, issueType, issue, urgency, reportStatus, description, username],
+            function (err) {
+                if (err) return res.status(500).json({ error: err.message });
+                res.status(200).json({
+                    id: this.lastID,
+                    location, date, time, issueType, issue, urgency, reportStatus, description
+                });
+            }
+        );
+    });
 });
 
 //Display all Reports

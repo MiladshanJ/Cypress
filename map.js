@@ -10,14 +10,61 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+const issueIcons = {
+    infrastructure: L.icon({
+        iconUrl: 'icons/infrastructure.png',
+        iconSize: [30, 30], 
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    utility: L.icon({
+        iconUrl: 'icons/utility.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    sanitation: L.icon({
+        iconUrl: 'icons/sanitation.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    environment: L.icon({
+        iconUrl: 'icons/environment.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    traffic: L.icon({
+        iconUrl: 'icons/traffic.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    }),
+    duplicate: L.icon({
+        iconUrl: 'icons/dup.png',
+        iconSize: [60, 60],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    })
+};
+
+
 fetch('/reports')
     .then(res => res.json())
     .then(data => {
         data.reports.forEach(report => {
             var [lat, lng] = report.location.split(',').map(position => parseFloat(position.trim()));
+            var selectedIcon;
 
-            var marker = L.marker([lat, lng]).addTo(map);
-            marker.bindPopup(`<b>Location:</b> ${report.location}<br><b>Issue:</b> ${report.issue}<br><b>Description:</b> ${report.desc}`);
+            if(report.status === "Duplicate"){
+                selectedIcon = issueIcons.duplicate;
+            } else {
+                selectedIcon = issueIcons[report.issueType];
+            }
+
+            var marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
+            marker.bindPopup(`<b>Location:</b> ${report.location}<br><b>Issue Type:</b> ${report.issueType}<br><b>Issue:</b> ${report.issue}<br><b>Status:</b> ${report.status}<br><b>Description:</b> ${report.description}`);
         });
     });
 
@@ -67,7 +114,7 @@ function setIssues() {
     };
     issueSelect.innerHTML = '';
     
-   
+    
     if (!issueTypes[issueType]) {
         var issue = document.createElement('option');
         issue.text = "Select an issue type first";
@@ -117,7 +164,6 @@ document.querySelector("form").addEventListener("submit",function(event) {
     let time = document.getElementById("time").value;
     let issueType = document.getElementById("issueType").value;
     let urgency = document.getElementById("urgency").value;
-    let reportStatus = "Open";
     let username = localStorage.getItem("username");
 
     fetch('/submit-report', {
@@ -131,15 +177,19 @@ document.querySelector("form").addEventListener("submit",function(event) {
             time,
             issueType,
             issue,
-            urgency,
-            reportStatus,  
+            urgency,  
             description,
             username
         })
     })
-
-    let marker = L.marker([lat, lng]).addTo(map);
-    marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Description:</b> ${description}`);
+    .then(res => res.json())
+    .then(data =>{
+        let marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.status}<br><b>Description:</b> ${description}`);
+    })
+    .catch(err => {
+        console.error("Failed to submit report:", err);
+    });
 
     this.reset();
     setIssues();
