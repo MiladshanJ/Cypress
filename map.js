@@ -214,6 +214,23 @@ document.querySelector("form").addEventListener("submit",function(event) {
     hide();
 });
 
+document.getElementById('logout').addEventListener('click', () => {
+    fetch('/logout', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message === 'Successful Logout') {
+            window.location.href = '/index.html';
+        } else {
+            alert('Logout failed: ' + data.message);
+        }
+    })
+    .catch(err => {
+        console.error('Logout error:', err);
+    });
+});
 
 map.on('click', function(e) {
     if (map.options.maxBounds.contains(e.latlng)) {
