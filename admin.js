@@ -120,6 +120,11 @@ function createGroupedReportBox(group) {
                 selectedIcon = issueIcons[group[0].issueType];
             }
             L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
+
+            for (let i = 1; i < group.length; i++) {
+                const [dupLat, dupLng] = group[i].location.split(',').map(coord => parseFloat(coord.trim()));
+                L.marker([dupLat, dupLng], { icon: issueIcons.duplicate }).addTo(map);
+            }
         } else {
             console.error("Map container not found:", `map-${group[0].id}`);
         }
