@@ -16,6 +16,13 @@ The **Cypress** system is a web application designed to automate and modernize t
 - **Database**: SQLite3
 - **Tools**: Git, VS Code
 
+## Database Structure 
+The Cypress system is under one database (cypress.db) with the following four tables
+- **admins:** (id, username, password, email)
+- **users:** (id, username, password, email, token)
+- **reports:** (id, location, date, time, issueType, issue, urgency, status, description, username)
+- **subscriptions:** (id, reported, username)
+
 ## ⚙️ Installation & Setup
 
 ```bash
