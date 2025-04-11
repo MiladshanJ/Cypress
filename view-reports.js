@@ -73,6 +73,10 @@ const issueIcons = {
     })
 };
 
+function centerMap(lat, lon) {
+    map.setView([lat, lon], 16);
+}
+
 function displayReports(reports) {
     reportsContainer.innerHTML = '';
     map.eachLayer(layer => {
@@ -103,7 +107,7 @@ function displayReports(reports) {
             </div>
             <div class="report-info">
                 <span><b>Submitted by:</b> ${username}</span>
-                <a href="https://www.openstreetmap.org/?mlat=${location.split(',')[0]}&mlon=${location.split(',')[1]}" class="map-link" target="_blank">View on Map</a>
+                <a href="#" onclick="centerMap(${location.split(',')[0]}, ${location.split(',')[1]}); return false;">View on Map</a>
             </div>
         `;
         reportsContainer.appendChild(reportBox);
