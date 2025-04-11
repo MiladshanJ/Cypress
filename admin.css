@@ -45,6 +45,14 @@ header {
     margin-bottom: 0.5rem;
 }
 
+.report-box.grouped {
+    background-color: #f0f8ff; 
+    border-left: 5px solid #0077cc;
+}
+.urgency {
+    font-weight: bold;
+}
+
 .report-buttons {
     display: flex;
     gap: 0.75rem;

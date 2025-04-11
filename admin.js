@@ -65,7 +65,7 @@ fetch('/current-reports')
 
 function createGroupedReportBox(group) {
     const reportBox = document.createElement('div');
-    reportBox.className = 'report-box';
+    reportBox.className = 'report-box grouped';
 
     let groupDetails = `<div id="map-${group[0].id}" class="map"></div>
                         <div class="report-info"><strong>Reports in this group:</strong> ${group.length}</div>`;
@@ -79,7 +79,7 @@ function createGroupedReportBox(group) {
             <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
             <div class="report-info"><strong>Description:</strong> ${report.description}</div>
             <div class="report-info"><strong>Status:</strong> ${report.status}</div>
-            <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
+            <div class="report-info"><strong>Urgency:</strong> <span class="urgency" style="color: ${getUrgencyColor(report.urgency)}">${report.urgency}</span></div>
             <div class="report-info"><strong>Date:</strong> ${report.date}</div>
             <div class="report-info"><strong>Time:</strong> ${report.time}</div>
             <div class="report-info"><strong>Location:</strong> ${report.location}</div>
@@ -140,7 +140,7 @@ function createReportBox(report) {
         <div class="report-info"><strong>Type:</strong> ${report.issueType}</div>
         <div class="report-info"><strong>Description:</strong> ${report.description}</div>
         <div class="report-info"><strong>Status:</strong> ${report.status}</div>
-        <div class="report-info"><strong>Urgency:</strong> ${report.urgency}</div>
+        <div class="report-info"><strong>Urgency:</strong> <span class="urgency" style="color: ${getUrgencyColor(report.urgency)}">${report.urgency}</span></div>
         <div class="report-info"><strong>Date:</strong> ${report.date}</div>
         <div class="report-info"><strong>Time:</strong> ${report.time}</div>
         <div class="report-info"><strong>Location:</strong> ${report.location}</div>
@@ -184,6 +184,15 @@ function createReportBox(report) {
     }, 0);
 
     return reportBox;
+}
+
+function getUrgencyColor(urgency) {
+    switch(urgency) {
+        case 'Low': return 'green';
+        case 'Medium': return '#fc8803';
+        case 'High': return 'red';
+        default: return 'black'; 
+    }
 }
 
 function groupReportsByDuplicate(reports) {
