@@ -29,10 +29,6 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'map.html'));
-  });
-
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
@@ -89,11 +85,11 @@ app.post('/register', (req, res) => {
     const hashedPassword = hashPassword(password);
     const token = crypto.randomBytes(32).toString('hex');
 
-    if (!username || !password) {
-        return res.json({ message: 'Username and password are required' });
+    if (!username || !password || !email) {
+        return res.json({ message: 'All fields are required' });
     }
     
-    db.run(`INSERT INTO users (username, password, email, token, verified) VALUES (?, ?, ?, ?, FALSE)`, 
+    db.run(`INSERT INTO users (username, password, email, token) VALUES (?, ?, ?, ?)`, 
         [username, hashedPassword, email, token], 
         function(err) {
             if (err) {

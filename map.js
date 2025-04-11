@@ -222,7 +222,7 @@ document.getElementById('logout').addEventListener('click', () => {
     .then(res => res.json())
     .then(data => {
         if (data.message === 'Successful Logout') {
-            window.location.href = '/index.html';
+            window.location.href = '/';
         } else {
             alert('Logout failed: ' + data.message);
         }
