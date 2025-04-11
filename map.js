@@ -64,7 +64,7 @@ fetch('/current-reports')
             }
 
             var marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
-            marker.bindPopup(`<b>Location:</b> ${report.location}<br><b>Issue Type:</b> ${report.issueType}<br><b>Issue:</b> ${report.issue}<br><b>Status:</b> ${report.status}<br><b>Description:</b> ${report.description}`);
+            marker.bindPopup(`<b>Location:</b> ${report.location}<br><b>Issue Type:</b> ${report.issueType}<br><b>Issue:</b> ${report.issue}<br><b>Status:</b> ${report.reportStatus}<br><b>Description:</b> ${report.description}`);
         });
     });
 
@@ -188,7 +188,7 @@ document.querySelector("form").addEventListener("submit",function(event) {
         var selectedIcon = issueIcons[data.issueType];
         
         let marker = L.marker([lat, lng],{icon: selectedIcon}).addTo(map);
-        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.status}<br><b>Description:</b> ${description}`);
+        marker.bindPopup(`<b>Location:</b> ${location}<br><b>Issue Type:</b> ${issueType}<br><b>Issue:</b> ${issue}<br><b>Status:</b> ${data.reportStatus}<br><b>Description:</b> ${description}`);
 
         if (subscribed && data.id && username) {
             fetch('/subscribe', {
