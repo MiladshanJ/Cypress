@@ -96,3 +96,31 @@ button {
 .btn.resolve:hover {
     background-color: #157347;
 }
+
+.topnav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(22, 87, 136);
+    padding: 20px;
+    color: white;
+}
+
+.topnav .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+}
+
+.topnav a {
+    color: white;
+    padding: 0 12px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.topnav a:hover {
+    background-color: #575757;
+    border-radius: 4px;
+}

@@ -29,6 +29,15 @@
     gap: 10px;
 }
 
+#logout {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 70px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
 textarea { resize: none; }
 
 body {
