@@ -37,4 +37,11 @@ npm install
 node server.js
 
 # 4. Open your browser
-http://localhost:3000
+http://localhost:300
+```
+
+## Contributors 
+- **Miladshan Jeevakaran**
+- **Jagroop Dhaliwal**
+- **Sahibjeet Sidhu**
+- **Samee Hanif**
