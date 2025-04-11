@@ -232,7 +232,7 @@ function calculateDistance(loc1, loc2) {
     const [lat1, lon1] = loc1.split(',').map(coord => parseFloat(coord.trim()));
     const [lat2, lon2] = loc2.split(',').map(coord => parseFloat(coord.trim()));
 
-    const R = 6371; // Radius of the Earth in kilometers
+    const R = 6371;
     const dLat = degToRad(lat2 - lat1);
     const dLon = degToRad(lon2 - lon1);
     const a = 

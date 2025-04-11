@@ -156,7 +156,6 @@ app.post('/submit-report', (req, res) => {
     let reportStatus = "Pending";
     const [lat1, lon1] = location.split(',').map(coord => parseFloat(coord.trim()));
 
-    //Duplicate Check - Version 1
     db.all('SELECT * FROM reports WHERE issueType = ? AND issue = ?', [issueType, issue], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         const duplicate = rows.find(row => {
