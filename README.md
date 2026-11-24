@@ -27,7 +27,7 @@ The Cypress system is under one database (cypress.db) with the following four ta
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/cypress.git
+git clone https://github.com/MiladshanJ/cypress.git
 cd cypress
 
 # 2. Install dependencies
@@ -37,7 +37,7 @@ npm install
 node server.js
 
 # 4. Open your browser
-http://localhost:300
+http://localhost:3000
 ```
 
 ## Contributors 
